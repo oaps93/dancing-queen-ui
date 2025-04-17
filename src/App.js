@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getData } from './services/api';
+import { getData, setClass } from './services/api';
 
 function App() {
   const [data, setData] = useState([]);
@@ -17,23 +17,30 @@ function App() {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     console.log('Form Submitted:', formData);
-    // Add API call here to send formData to the server
-    setData(formData);
-  };
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await getData();
-        setData(response);
-      } catch (err) {
-        setError('Failed to fetch data');
-      }
+    try {
+      const response = await setClass(formData);
+      console.log('New class added: ', response);
+      //Refresh data
+      fetchData();
+    } catch (err) {
+      setError ('Failed to post class')
     }
 
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await getData();
+      setData(response);
+    } catch (err) {
+      setError('Failed to fetch classes');
+    }
+  }
+
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -45,7 +52,7 @@ function App() {
       <h2>New class</h2>
       <form onSubmit={handleSubmit}>
         <label>
-          ClassName:
+          Class name:
           <input
           type="text"
           name="className"
@@ -64,7 +71,7 @@ function App() {
           />
         </label>
         <br />
-        <button type="submit">Crear clase</button>
+        <button type="submit">Submit class</button>
       </form>
       </div>
 
